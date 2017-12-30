@@ -8,7 +8,10 @@ lazy val root = (project in file(".")).
       version      := "0.1.0-SNAPSHOT"
     )),
     name := "jade-mine",
+    assemblyJarName in assembly := "jade-mine.jar",
     libraryDependencies ++= xchange,
+    libraryDependencies += httpclient,
+    libraryDependencies ++= jackson,
     libraryDependencies += scalaTest % Test
   )
 

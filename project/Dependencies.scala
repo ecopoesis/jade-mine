@@ -4,6 +4,14 @@ object Dependencies {
   lazy val scalaTest = "org.scalatest" %% "scalatest" % "3.0.3"
   lazy val xchange = Seq(
     "org.knowm.xchange" % "xchange-core" % "4.3.1",
-    "org.knowm.xchange" % "xchange-gdax" % "4.3.1"
+    "org.knowm.xchange" % "xchange-gdax" % "4.3.1",
+    "org.knowm.xchange" % "xchange-bitstamp" % "4.3.1"
+  )
+  lazy val httpclient = "org.apache.httpcomponents" % "httpclient" % "4.5.4"
+  lazy val jackson = Seq(
+    "com.fasterxml.jackson.core" % "jackson-databind" % "2.9.2",
+    "com.fasterxml.jackson.module" %% "jackson-module-scala" % "2.9.2",
+    "com.fasterxml.jackson.datatype" % "jackson-datatype-jsr310" % "2.9.2"
+
   )
 }
