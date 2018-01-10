@@ -12,6 +12,8 @@ lazy val root = (project in file(".")).
     libraryDependencies ++= xchange,
     libraryDependencies += httpclient,
     libraryDependencies ++= jackson,
+    libraryDependencies += flyway,
+    libraryDependencies += postgres,
     libraryDependencies += scalaTest % Test
   )
 

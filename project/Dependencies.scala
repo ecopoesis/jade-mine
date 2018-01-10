@@ -8,6 +8,8 @@ object Dependencies {
     "org.knowm.xchange" % "xchange-bitstamp" % "4.3.1"
   )
   lazy val httpclient = "org.apache.httpcomponents" % "httpclient" % "4.5.4"
+  lazy val flyway = "org.flywaydb" % "flyway-core" % "5.0.3"
+  lazy val postgres = "org.postgresql" % "postgresql" % "42.1.4"
   lazy val jackson = Seq(
     "com.fasterxml.jackson.core" % "jackson-databind" % "2.9.2",
     "com.fasterxml.jackson.module" %% "jackson-module-scala" % "2.9.2",
