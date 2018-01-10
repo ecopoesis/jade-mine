@@ -14,6 +14,8 @@ lazy val root = (project in file(".")).
     libraryDependencies ++= jackson,
     libraryDependencies += flyway,
     libraryDependencies += postgres,
+    libraryDependencies += anorm,
+    libraryDependencies += scalikejdbc,
     libraryDependencies += scalaTest % Test
   )
 
