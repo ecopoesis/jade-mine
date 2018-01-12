@@ -4,7 +4,7 @@ lazy val root = (project in file(".")).
   settings(
     inThisBuild(List(
       organization := "org.miker",
-      scalaVersion := "2.12.4",
+      scalaVersion := "2.11.12",
       version      := "0.1.0-SNAPSHOT"
     )),
     name := "jade-mine",
@@ -17,6 +17,7 @@ lazy val root = (project in file(".")).
     libraryDependencies += anorm,
     libraryDependencies += scalikejdbc,
     libraryDependencies += commonsMath,
+    libraryDependencies += vegas,
     libraryDependencies += scalaTest % Test
   )
 

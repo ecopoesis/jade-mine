@@ -16,6 +16,9 @@ import scalikejdbc.ConnectionPool
 import anorm._
 import anorm.SqlParser._
 import org.apache.commons.math3.stat.descriptive.SummaryStatistics
+import vegas._
+import vegas.render.WindowRenderer._
+import vegas.data.External._
 
 import scala.collection.mutable
 
@@ -114,6 +117,25 @@ object JadeMine extends App {
           println(idx + " " + y(idx))
         }
     }
+
+    val data =
+      y.zipWithIndex.map { case (s: BigDecimal, i: Int) => Map("x" -> i, "y" -> s, "name" -> "y", "row" -> "data") } ++
+      avgFilter.zipWithIndex.map { case (s: BigDecimal, i: Int) => Map("x" -> i, "y" -> s, "name" -> "avgFilter", "row" -> "data") } ++
+      avgFilter.zipWithIndex.map { case (s: BigDecimal, i: Int) => Map("x" -> i, "y" -> (s - threshold * stdFilter(i)), "name" -> "lower", "row" -> "data") } ++
+      avgFilter.zipWithIndex.map { case (s: BigDecimal, i: Int) => Map("x" -> i, "y" -> (s + threshold * stdFilter(i)), "name" -> "upper", "row" -> "data") } ++
+      signals.zipWithIndex.map { case (s: Int, i: Int) => Map("x" -> i, "y" -> s, "name" -> "signal", "row" -> "signal") }
+
+    Vegas("Smoothed Z", width=600d, height=600d)
+      .withData(data)
+      .mark(Line)
+      .encodeX("x", Quant)
+      .encodeY("y", Quant)
+      .encodeColor(
+        field="name",
+        dataType=Nominal
+      )
+      .encodeRow("row", Ordinal)
+      .show
   }
 
   private def latestData: ZonedDateTime = {
