@@ -12,6 +12,7 @@ object Dependencies {
   lazy val postgres = "org.postgresql" % "postgresql" % "42.1.4"
   lazy val anorm = "com.typesafe.play" %% "anorm" % "2.5.3"
   lazy val scalikejdbc = "org.scalikejdbc" %% "scalikejdbc" % "3.1.0"
+  lazy val commonsMath =  "org.apache.commons" % "commons-math3" % "3.6.1"
   lazy val jackson = Seq(
     "com.fasterxml.jackson.core" % "jackson-databind" % "2.9.2",
     "com.fasterxml.jackson.module" %% "jackson-module-scala" % "2.9.2",
