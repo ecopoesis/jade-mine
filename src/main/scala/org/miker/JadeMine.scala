@@ -45,14 +45,14 @@ object JadeMine extends App {
 
   // find best variables
   def variants = for (
-    lag <- (5 to 3600 by 5).toStream; // seconds lookback
-    threshold <- (BigDecimal(0.1) to BigDecimal(10) by BigDecimal(0.1)).toStream; // std deviations
-    influence <- (BigDecimal(0) to BigDecimal(1) by BigDecimal(0.01)).toStream; // influence?
+    lag <- (5 to 600 by 5).toStream; // seconds lookback
+    threshold <- (BigDecimal(0.25) to BigDecimal(5) by BigDecimal(0.25)).toStream; // std deviations
+    influence <- (BigDecimal(0) to BigDecimal(1) by BigDecimal(0.1)).toStream; // influence?
     percent <- (BigDecimal(0) to BigDecimal(.1) by BigDecimal(0.01)).toStream // pct change
   ) yield (lag, threshold, influence, percent)
 
   variants.foreach { case (lag, threshold, influence, percent) =>
-    val algo = new SmoothedZscore[ZonedDateTime](lag, BigDecimal(1.5), influence)
+    val algo = new SmoothedZscore[ZonedDateTime](lag, threshold, influence)
     var current: Outlier.EnumValue = Outlier.Valley
     var last = data.head.close
     var bitcoin = BigDecimal(1)
