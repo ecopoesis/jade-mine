@@ -13,7 +13,7 @@ import org.knowm.xchange.bitstamp.service.BitstampMarketDataServiceRaw
 import org.knowm.xchange.currency.CurrencyPair
 import org.knowm.xchange.service.marketdata.MarketDataService
 import org.miker.Gdax.Ohlc
-import org.miker.threshold.{Outlier, SmoothedZscore}
+import org.miker.threshold.{Outlier, SmoothedZscore, SmoothedZscoreDebounce}
 import scalikejdbc.ConnectionPool
 
 import scala.concurrent.Future
@@ -43,53 +43,41 @@ object JadeMine extends App {
 
   //Testbed.smoothedZScore(data.map(t => t.close.toDouble), 30, 5d, 0d)
 
-  // find best variables
-  def variants = for (
-    lag <- (5 to 3600 by 5).toStream; // seconds lookback
-    threshold <- (BigDecimal(0.1) to BigDecimal(10) by BigDecimal(0.1)).toStream; // std deviations
-    influence <- (BigDecimal(0) to BigDecimal(1) by BigDecimal(0.01)).toStream; // influence?
-    percent <- (BigDecimal(0) to BigDecimal(.1) by BigDecimal(0.01)).toStream // pct change
-  ) yield (lag, threshold, influence, percent)
+  val lag = 5
+  val threshold = BigDecimal(1.5)
+  val influence = BigDecimal(0.62)
+  val percent = BigDecimal(0.4)
 
-  variants.foreach { case (lag, threshold, influence, percent) =>
-    val algo = new SmoothedZscore[ZonedDateTime](lag, BigDecimal(1.5), influence)
-    var current: Outlier.EnumValue = Outlier.Valley
-    var last = data.head.close
-    var bitcoin = BigDecimal(1)
-    var dollars = BigDecimal(0)
-    var operations = 0
+  val algo = new SmoothedZscoreDebounce[ZonedDateTime](lag, BigDecimal(1.5), influence)
+  var current: Outlier.EnumValue = Outlier.Valley
+  var last = data.head.close
+  var bitcoin = BigDecimal(1)
+  var dollars = BigDecimal(0)
+  var operations = 0
 
-    data.foreach { t =>
-      algo.smoothedZScore(t.time, t.close).foreach { o =>
-        if (o != current && Math.abs((t.close - last).toDouble) / last > percent) {
-          current = o
-          last = t.close
-          operations += 1
-          if (o == Outlier.Peak) {
-            // sell bitcoin at peaks
-            dollars = bitcoin * t.close
-            bitcoin = 0
-          } else {
-            // buy bitcoin at valleys
-            bitcoin = dollars / t.close
-            dollars = 0
-          }
+  data.foreach { t =>
+    algo.smoothedZScore(t.time, t.close).foreach { o =>
+      if (o != current && Math.abs((t.close - last).toDouble) / last > percent) {
+        current = o
+        last = t.close
+        operations += 1
+        if (o == Outlier.Peak) {
+          // sell bitcoin at peaks
+          dollars = bitcoin * t.close
+          bitcoin = 0
+        } else {
+          // buy bitcoin at valleys
+          bitcoin = dollars / t.close
+          dollars = 0
         }
       }
     }
-    if (bitcoin == BigDecimal(0)) {
-      bitcoin = dollars / data.last.close
-    }
-
-    if (bitcoin > 2) {
-      println(lag.toString + "\t" + threshold.toString + "\t" + influence.toString + "\t" + percent.toString + "\t" + operations + "\t" + bitcoin.toString)
-    }
   }
 
-  /*
-  5	1.5	0.76	0.04	210	2.202893589891755826962917368557965
-  5	1.5	0.77	0.04	210	2.202893589891755826962917368557965
-  */
+  if (bitcoin == BigDecimal(0)) {
+    bitcoin = dollars / data.last.close
+  }
+  println(lag.toString + "\t" + threshold.toString + "\t" + influence.toString + "\t" + percent.toString + "\t" + operations + "\t" + bitcoin.toString)
 
   // Use the factory to get Bitstamp exchange API using default settings
   //val bitstamp = ExchangeFactory.INSTANCE.createExchange(classOf[BitstampExchange].getName)
