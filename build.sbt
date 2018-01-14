@@ -9,6 +9,7 @@ lazy val root = (project in file(".")).
     )),
     name := "jade-mine",
     assemblyJarName in assembly := "jade-mine.jar",
+    mainClass in assembly := Some("org.miker.JadeMine"),
     libraryDependencies ++= xchange,
     libraryDependencies += httpclient,
     libraryDependencies ++= jackson,
