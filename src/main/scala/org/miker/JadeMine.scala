@@ -13,7 +13,7 @@ import org.knowm.xchange.bitstamp.service.BitstampMarketDataServiceRaw
 import org.knowm.xchange.currency.CurrencyPair
 import org.knowm.xchange.service.marketdata.MarketDataService
 import org.miker.Gdax.Ohlc
-import org.miker.threshold.{Outlier, SmoothedZscore}
+import org.miker.threshold.{Outlier, SmoothedZscore, SmoothedZscoreDebounce}
 import scalikejdbc.ConnectionPool
 
 import scala.concurrent.Future
@@ -48,11 +48,11 @@ object JadeMine extends App {
     lag <- (5 to 600 by 5).toStream; // seconds lookback
     threshold <- (BigDecimal(0.25) to BigDecimal(5) by BigDecimal(0.25)).toStream; // std deviations
     influence <- (BigDecimal(0) to BigDecimal(1) by BigDecimal(0.1)).toStream; // influence?
-    percent <- (BigDecimal(0) to BigDecimal(.1) by BigDecimal(0.01)).toStream // pct change
+    percent <- List(BigDecimal(0)) // (BigDecimal(0) to BigDecimal(.1) by BigDecimal(0.01)).toStream // pct change
   ) yield (lag, threshold, influence, percent)
 
   variants.foreach { case (lag, threshold, influence, percent) =>
-    val algo = new SmoothedZscore[ZonedDateTime](lag, threshold, influence)
+    val algo = new SmoothedZscoreDebounce[ZonedDateTime](lag, threshold, influence)
     var current: Outlier.EnumValue = Outlier.Valley
     var last = data.head.close
     var bitcoin = BigDecimal(1)
@@ -81,7 +81,7 @@ object JadeMine extends App {
       bitcoin = dollars / data.last.close
     }
 
-    if (bitcoin > 2) {
+    if (bitcoin > 1) {
       println(lag.toString + "\t" + threshold.toString + "\t" + influence.toString + "\t" + percent.toString + "\t" + operations + "\t" + bitcoin.toString)
     }
   }
