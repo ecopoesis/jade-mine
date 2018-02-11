@@ -18,6 +18,7 @@ lazy val root = (project in file(".")).
     libraryDependencies += anorm,
     libraryDependencies += scalikejdbc,
     libraryDependencies += commonsMath,
+    libraryDependencies += fastutil,
     libraryDependencies += scalaTest % Test
   )
 

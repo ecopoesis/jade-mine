@@ -9,6 +9,8 @@ import anorm.SqlParser._
 import anorm.{Macro, RowParser, _}
 import info.bitrich.xchangestream.core.{ProductSubscription, StreamingExchangeFactory}
 import info.bitrich.xchangestream.gdax.GDAXStreamingExchange
+import io.reactivex.Scheduler
+import io.reactivex.schedulers.Schedulers
 import org.flywaydb.core.Flyway
 import org.knowm.xchange.ExchangeFactory
 import org.knowm.xchange.bitstamp.service.BitstampMarketDataServiceRaw
@@ -35,13 +37,15 @@ object JadeMine extends App {
   // Gdax.history(latestData)
 
   val streamingExchange = StreamingExchangeFactory.INSTANCE.createExchange(classOf[GDAXStreamingExchange].getName)
-  streamingExchange.connect(ProductSubscription.create().addTicker(CurrencyPair.BTC_USD).build()).blockingAwait()
+  streamingExchange.connect(ProductSubscription.create().addAll(CurrencyPair.BTC_USD).build()).blockingAwait()
 
   val exSpec = new GDAXExchange().getDefaultExchangeSpecification
   exSpec.setApiKey(gdax_key)
   exSpec.setSecretKey(gdax_secret)
   exSpec.setExchangeSpecificParametersItem("passphrase", gdax_pass)
   val exchange = ExchangeFactory.INSTANCE.createExchange(exSpec)
+
+  val orderBook = new OrderBook(streamingExchange)
 
   val lag = 5                           // seconds lookback
   val threshold = BigDecimal(0.5)       // std deviations
@@ -54,7 +58,7 @@ object JadeMine extends App {
   var balances: Balances = _
 
   var lastTime = new Date()
-  val ticker = streamingExchange.getStreamingMarketDataService.getTicker(CurrencyPair.BTC_USD).subscribe(t => {
+  val tickerStream = streamingExchange.getStreamingMarketDataService.getTicker(CurrencyPair.BTC_USD).observeOn(Schedulers.newThread()).subscribe(t => {
     if (last == null) {
       // first run only
       last = t.getLast
@@ -102,6 +106,16 @@ object JadeMine extends App {
       }
     }
   }
+
+  // make trade
+  // - mark trading bit
+  // - find gap
+  // - create post only trade, limited time frame (30 sec?)
+  // - if success, goto wait for fills
+  // - if failure, goto make trade
+  //
+  // wait for fills
+  // -
 
   private def getBalances: Balances = {
     val accountInfo = exchange.getAccountService.getAccountInfo

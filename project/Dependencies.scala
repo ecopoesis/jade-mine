@@ -21,5 +21,5 @@ object Dependencies {
     "com.fasterxml.jackson.module" %% "jackson-module-scala" % "2.9.2",
     "com.fasterxml.jackson.datatype" % "jackson-datatype-jsr310" % "2.9.2"
   )
-  lazy val java8Compat = "org.scala-lang.modules" %% "scala-java8-compat" % "0.8.0"
+  lazy val fastutil = "it.unimi.dsi" % "fastutil" % "8.1.1"
 }
