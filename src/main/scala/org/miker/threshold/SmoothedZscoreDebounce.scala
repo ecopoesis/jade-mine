@@ -2,11 +2,10 @@ package org.miker.threshold
 
 import org.apache.commons.math3.stat.descriptive.SummaryStatistics
 
-import scala.collection.mutable
-
 /**
   * Smoothed zero-score alogrithm shamelessly copied from https://stackoverflow.com/a/22640362/6029703
   * Uses a rolling mean and a rolling deviation (separate) to identify peaks in a vector
+  * rather then single at the start of trend, signal at the end of a trend
   *
   * @param lag - The lag of the moving window (i.e. how big the window is)
   * @param threshold - The z-score at which the algorithm signals (i.e. how many standard deviations away from the moving mean a peak (or signal) is)

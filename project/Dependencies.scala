@@ -5,7 +5,9 @@ object Dependencies {
   lazy val xchange = Seq(
     "org.knowm.xchange" % "xchange-core" % "4.3.1",
     "org.knowm.xchange" % "xchange-gdax" % "4.3.1",
-    "org.knowm.xchange" % "xchange-bitstamp" % "4.3.1"
+    "org.knowm.xchange" % "xchange-bitstamp" % "4.3.1",
+    "info.bitrich.xchange-stream" % "xchange-stream-core" % "4.3.1",
+    "info.bitrich.xchange-stream" % "xchange-gdax" % "4.3.1"
   )
   lazy val httpclient = "org.apache.httpcomponents" % "httpclient" % "4.5.4"
   lazy val flyway = "org.flywaydb" % "flyway-core" % "5.0.3"
@@ -19,4 +21,5 @@ object Dependencies {
     "com.fasterxml.jackson.module" %% "jackson-module-scala" % "2.9.2",
     "com.fasterxml.jackson.datatype" % "jackson-datatype-jsr310" % "2.9.2"
   )
+  lazy val java8Compat = "org.scala-lang.modules" %% "scala-java8-compat" % "0.8.0"
 }
